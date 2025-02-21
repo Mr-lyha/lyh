@@ -1,0 +1,96 @@
+使用 Foundry 在 Monad 上部署智能合约
+Foundry是一个用 Rust 编写的用于以太坊应用程序开发的超快、可移植且模块化的工具包。
+
+开始之前，您需要安装以下工具：
+
+锈
+货物
+1.foundryup
+Foundryup 是 Foundry 工具链的官方安装程序。
+
+curl -L https://foundry.paradigm.xyz | bash
+
+这将安装 Foundryup。只需按照屏幕上的说明操作，该foundryup命令就会在您的 CLI 中可用。
+
+2.安装forge、cast和anvilchisel
+foundryup
+
+笔记
+如果您使用的是 Windows，则需要安装并使用 Git BASH 或 WSL 作为您的终端，因为 Foundryup 目前不支持 Powershell 或命令提示符 (Cmd)。
+
+3.创建一个新的Foundry
+提示
+您可以使用foundry-monad模板来创建新项目。
+
+Foundry-Monad是一个带有 Monad 配置的 Foundry 模板。因此开发人员无需在 Foundry 中为 Monad 网络进行初始配置。
+
+以下命令用于foundry-monad创建一个新的铸造项目：
+
+forge init --template monad-developers/foundry-monad [project_name]
+
+或者，您可以使用以下命令创建默认的铸造项目：
+
+forge init [project_name]
+
+4.修改Foundry
+更新foundry.toml文件以添加 Monad 配置。
+
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+
+# Monad Configuration
+eth-rpc-url="https://testnet-rpc.monad.xyz"
+chain_id = "10143"
+
+5. 编写智能
+您可以在文件夹下编写智能合约。项目中src已有一个合约，位于。Countersrc/Counter.sol
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.13;
+
+contract Counter {
+    uint256 public number;
+
+    function setNumber(uint256 newNumber) public {
+        number = newNumber;
+    }
+
+    function increment() public {
+        number++;
+    }
+}
+
+6. 编译智能
+forge compile
+
+编译过程输出可以在新创建的目录中找到out，其中包括 Contract ABI 和字节码。
+
+7. 部署智能
+笔记
+对于部署合约，我们建议不要使用与真实资金关联的私钥。创建一个新的钱包或拥有一个仅用于开发的钱包。
+
+获取测试网
+部署智能合约需要测试网资金。通过水龙头领取测试网资金。
+
+部署智能
+使用密钥库（推荐）
+直接使用私钥
+密钥库是 Foundry 项目中使用私钥的一种更安全的方法，因为密钥库会加密私钥，并且可以在任何需要私钥的命令中引用它。
+
+使用以下命令创建一个新的钱包密钥库
+
+cast wallet import <keystore_name> --interactive
+
+出现提示时输入您的钱包的私钥并提供密码来加密它。
+
+运行以下命令来部署你的智能合约
+
+forge create src/Counter.sol:Counter --account <keystore_name>
+
+成功部署智能合约后，输出应类似于以下内容：
+
+Deployer: 0xB1aB62fdFC104512F594fCa0EF6ddd93FcEAF67b
+Deployed to: 0x67329e4dc233512f06c16cF362EC3D44Cdc800e0
+Transaction hash: 0xa0a40c299170c9077d321a93ec20c71e91b8aff54dd9fa33f08d6b61f8953ee0
